@@ -1,0 +1,74 @@
+/** notes for this project **/
+
+
+difference between
+
+char *std_input = malloc(BUFFSIZE);
+malloc(BUFFSIZE * sizeof(char ));
+malloc(BUFFSIZE * sizeof(char *));
+
+
+User
+explain what each malloc does in detail.
+
+
+Let's break down the differences between these `malloc` calls:
+
+1. **`char *std_input = malloc(BUFFSIZE);`**
+
+   * This allocates a contiguous block of memory that is `BUFFSIZE` bytes long.
+   * The return value (a memory address) is stored in the `std_input` pointer, which is of type `char *`. This means `std_input` can now point to the beginning of this allocated memory block, and you can treat it as an array of `BUFFSIZE` characters.  
+   * Example:  If `BUFFSIZE` is 1024, you get 1024 bytes of memory to store characters. You could store a string of up to 1023 characters (plus the null terminator) in this allocated space.
+
+2. **`malloc(BUFFSIZE * sizeof(char));`**
+
+   * This is functionally equivalent to the first example.  `sizeof(char)` is always 1 by definition in C. So, this also allocates `BUFFSIZE` bytes of memory.  
+   * The difference is that the returned memory address is *not* stored in a variable. This is a memory leak! The allocated memory is unusable because you have no way to access it after the `malloc` call. You've lost the pointer to the memory you allocated.
+
+3. **`malloc(BUFFSIZE * sizeof(char *));`**
+
+   * This allocates a contiguous block of memory that is `BUFFSIZE` times the size of a *character pointer* (`char *`).  
+   * Character pointers store memory addresses.  The size of a `char *` (pointer) depends on the system's architecture (e.g., 4 bytes on a 32-bit system, 8 bytes on a 64-bit system).
+   * This `malloc` call is typically used when you want to create an array of character pointers. For instance, if you want to store an array of strings, where each element of the array points to a different string.
+   * Example: If `BUFFSIZE` is 10 and you're on a 64-bit system (where pointers are 8 bytes), this allocates 10 * 8 = 80 bytes of memory. This would allow you to store the addresses of 10 different strings (you'd need to allocate memory for each string separately).
+
+
+**Key Differences Summarized:**
+
+| `malloc` Call                     | Bytes Allocated                     | Purpose                                                       |
+|-----------------------------------|-------------------------------------|---------------------------------------------------------------|
+| `malloc(BUFFSIZE);`                | `BUFFSIZE`                         | Allocate memory for a character array (e.g., a string).       |
+| `malloc(BUFFSIZE * sizeof(char));` | `BUFFSIZE`                         | Same as above but with an unnecessary `sizeof(char)`. Causes a memory leak because the returned pointer isn't stored. |
+| `malloc(BUFFSIZE * sizeof(char *));` | `BUFFSIZE * sizeof(char *)`        | Allocate memory for an array of character pointers (e.g., an array of strings). |
+
+
+**Important Note about `malloc`:**
+
+Always check the return value of `malloc`. It returns `NULL` if the memory allocation fails (e.g., if there's not enough free memory).  Using a `NULL` pointer will lead to a crash.  So, proper error handling is essential:
+
+```c
+char *std_input = malloc(BUFFSIZE);
+if (std_input == NULL) {
+    perror("malloc failed"); // Print an error message
+    exit(1);                  // Exit the program
+}
+
+// ... use std_input ...
+
+free(std_input); // Don't forget to free the allocated memory when you're done with it!
+```
+
+
+Important Note about malloc:
+
+Always check the return value of malloc. It returns NULL if the memory allocation fails (e.g., if there's not enough free memory). Using a NULL pointer will lead to a crash. So, proper error handling is essential:
+
+char *std_input = malloc(BUFFSIZE);
+if (std_input == NULL) {
+    perror("malloc failed"); // Print an error message
+    exit(1);                  // Exit the program
+}
+
+// ... use std_input ...
+
+free(std_input); // Don't forget to free the allocated memory when you're done with it!

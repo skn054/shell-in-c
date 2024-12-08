@@ -1,0 +1,27 @@
+#### build a simple shell in C.
+
+steps followed.
+
+stage 1:
+what does shell do?
+#1. take command from stdin.
+#2. breaks it into command and arguments.
+#3. run the command.
+we have to repeat #1 to #3 in a loop. we can exit the shell using exit command.
+shell will keep waiting for input from user.
+
+stage 1:
+    step1  : read from stdin. (done)
+            DONE: 1) problem here, user can enter command of any length, our buffer should be flexible to make input command of any length(done).
+    step 2: 
+            DONE: 1) separate command from arguments use whitespace as delimiter.
+            DONE: 2) return an array of strings where first string is command/program to be exectued by shell.
+            DONE: 3) assume initial size of array of string as buff_size, when number of srings get bigger than buffer size, reallocate 
+               array of strings to hold bigger block of memory.
+    step 3: launch_shell:
+            core of the shell. we want to run the program which is given as a command. In unix environment there is only one process
+            and all other process are created from that process. 
+            we use the same idea, we fork our shell program(is creates a duplicate copy of our shell program),then we use
+            exec system call to override the content of forked process with program that needs to be run.
+            
+
